@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import solidAvatarData from '../data/asciiPoints.json';
+import { sound } from '../utils/audio';
 
 interface Point {
   x: number;
@@ -23,6 +24,14 @@ interface Particle {
   shimmer: number;
 }
 
+interface Shockwave {
+  x: number;
+  y: number;
+  startTime: number;
+  maxRadius: number;
+  speed: number;
+}
+
 const getCanvasSize = (w: number) => {
   if (w <= 480) return Math.min(240, w - 40);
   if (w <= 768) return Math.min(300, w - 60);
@@ -34,6 +43,7 @@ export const AsciiSilhouette: React.FC = () => {
   const mouseRef = useRef({ x: -1000, y: -1000, active: false });
   const targetMouseRef = useRef({ x: -1000, y: -1000 });
   const particlesRef = useRef<Particle[]>([]);
+  const shockwavesRef = useRef<Shockwave[]>([]);
   const startTimeRef = useRef<number>(performance.now());
 
   const [canvasSize, setCanvasSize] = useState<number>(() =>
@@ -105,7 +115,8 @@ export const AsciiSilhouette: React.FC = () => {
       const particles = particlesRef.current;
       const mouse = mouseRef.current;
       const targetMouse = targetMouseRef.current;
-      const elapsed = (performance.now() - startTimeRef.current) / 1000;
+      const now = performance.now();
+      const elapsed = (now - startTimeRef.current) / 1000;
 
       // Mouse smoothing
       mouse.x += (targetMouse.x - mouse.x) * 0.15;
@@ -116,13 +127,37 @@ export const AsciiSilhouette: React.FC = () => {
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
 
+      // 1. Process active shockwaves
+      const activeShockwaves: Shockwave[] = [];
+      shockwavesRef.current.forEach((sw) => {
+        const age = (now - sw.startTime) / 1000;
+        const radius = age * sw.speed;
+
+        if (radius < sw.maxRadius) {
+          activeShockwaves.push(sw);
+          const progress = radius / sw.maxRadius;
+          const ringAlpha = (1 - progress) * 0.4;
+
+          // Draw faint glowing ring
+          ctx.save();
+          ctx.beginPath();
+          ctx.arc(sw.x, sw.y, radius, 0, Math.PI * 2);
+          ctx.strokeStyle = `rgba(180, 217, 253, ${ringAlpha})`;
+          ctx.lineWidth = 1.5;
+          ctx.stroke();
+          ctx.restore();
+        }
+      });
+      shockwavesRef.current = activeShockwaves;
+
+      // 2. Update and render particles
       particles.forEach((p) => {
         const timeSince = elapsed - p.delay;
         if (timeSince < 0) return;
 
         // Smooth assembly easing
         const introProgress = 1 - Math.pow(1 - Math.min(timeSince / 1.5, 1), 2);
-        const isInteracting = mouse.active || timeSince < 3;
+        const isInteracting = mouse.active || timeSince < 3 || activeShockwaves.length > 0;
         const shimmerOffset = isInteracting
           ? Math.sin(elapsed * 2 + p.shimmer) * 0.1
           : 0;
@@ -130,7 +165,7 @@ export const AsciiSilhouette: React.FC = () => {
         p.currentAlpha = Math.max(0, p.baseAlpha * introProgress + shimmerOffset);
         const springPower = 1 - Math.pow(1 - Math.min(timeSince / 2.5, 1), 3);
 
-        // Interactive mouse repulsion
+        // A. Interactive continuous mouse repulsion
         if (mouse.active) {
           const dx = p.x - mouse.x;
           const dy = p.y - mouse.y;
@@ -144,7 +179,25 @@ export const AsciiSilhouette: React.FC = () => {
           }
         }
 
-        // Spring back to target position
+        // B. Active Shockwave impulse physics
+        activeShockwaves.forEach((sw) => {
+          const age = (now - sw.startTime) / 1000;
+          const waveRadius = age * sw.speed;
+          const dx = p.x - sw.x;
+          const dy = p.y - sw.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+
+          // Impulse applied as the wave front sweeps across the particle
+          const distFromFront = Math.abs(dist - waveRadius);
+          if (distFromFront < 24 && dist > 0) {
+            const progress = waveRadius / sw.maxRadius;
+            const waveForce = (1 - progress) * (1 - distFromFront / 24) * 6.5;
+            p.vx += (dx / dist) * waveForce;
+            p.vy += (dy / dist) * waveForce;
+          }
+        });
+
+        // C. Spring back to target position
         const targetDx = p.targetX - p.x;
         const targetDy = p.targetY - p.y;
         const springFactor = 0.01 + springPower * 0.08;
@@ -178,10 +231,40 @@ export const AsciiSilhouette: React.FC = () => {
         p.x += p.vx;
         p.y += p.vy;
 
-        // Signature Ice-Blue palette styling
-        ctx.fillStyle = `rgba(180, 217, 253, ${p.currentAlpha})`;
+        // D. Kinetic Velocity Glow: particles brighten toward white when moving fast
+        const speed = Math.sqrt(p.vx * p.vx + p.vy * p.vy);
+        const energy = Math.min(1.0, speed / 5.0);
+
+        if (energy > 0.05) {
+          // Interpolate from Ice Blue (#B4D9FD / 180, 217, 253) toward pure Electric White
+          const r = Math.round(180 + (255 - 180) * energy);
+          const g = Math.round(217 + (255 - 217) * energy);
+          const b = Math.round(253 + (255 - 253) * energy);
+          const alpha = Math.min(1.0, p.currentAlpha + energy * 0.35);
+          ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${alpha})`;
+        } else {
+          ctx.fillStyle = `rgba(180, 217, 253, ${p.currentAlpha})`;
+        }
+
         ctx.fillText(p.char, p.x, p.y);
       });
+    };
+
+    // Trigger shockwave at position
+    const triggerShockwave = (clientX: number, clientY: number) => {
+      const rect = canvas.getBoundingClientRect();
+      const x = clientX - rect.left;
+      const y = clientY - rect.top;
+
+      shockwavesRef.current.push({
+        x,
+        y,
+        startTime: performance.now(),
+        maxRadius: canvasSize * 0.85,
+        speed: 550, // fast, punchy shockwave speed in px/sec
+      });
+
+      sound.playWarp();
     };
 
     // Event listeners
@@ -190,6 +273,17 @@ export const AsciiSilhouette: React.FC = () => {
       targetMouseRef.current.x = e.clientX - rect.left;
       targetMouseRef.current.y = e.clientY - rect.top;
       mouseRef.current.active = true;
+    };
+
+    const handleClick = (e: MouseEvent) => {
+      triggerShockwave(e.clientX, e.clientY);
+    };
+
+    const handleTouchStart = (e: TouchEvent) => {
+      if (e.touches.length > 0) {
+        const touch = e.touches[0];
+        triggerShockwave(touch.clientX, touch.clientY);
+      }
     };
 
     const handleTouchMove = (e: TouchEvent) => {
@@ -208,7 +302,9 @@ export const AsciiSilhouette: React.FC = () => {
     };
 
     canvas.addEventListener('mousemove', handleMouseMove);
+    canvas.addEventListener('click', handleClick);
     canvas.addEventListener('mouseleave', handleMouseLeave);
+    canvas.addEventListener('touchstart', handleTouchStart, { passive: true });
     canvas.addEventListener('touchmove', handleTouchMove, { passive: false });
     canvas.addEventListener('touchend', handleMouseLeave);
 
@@ -217,24 +313,26 @@ export const AsciiSilhouette: React.FC = () => {
     return () => {
       cancelAnimationFrame(animationId);
       canvas.removeEventListener('mousemove', handleMouseMove);
+      canvas.removeEventListener('click', handleClick);
       canvas.removeEventListener('mouseleave', handleMouseLeave);
+      canvas.removeEventListener('touchstart', handleTouchStart);
       canvas.removeEventListener('touchmove', handleTouchMove);
       canvas.removeEventListener('touchend', handleMouseLeave);
     };
   }, [canvasSize, isReady]);
 
   return (
-    <div className="relative flex items-center justify-center">
+    <div className="relative flex flex-col items-center justify-center">
       <canvas
         ref={canvasRef}
-        className="simulation-container select-none"
+        className="simulation-container select-none active:scale-[0.99] transition-transform duration-100"
         style={{
           width: `${canvasSize}px`,
           height: `${canvasSize}px`,
           cursor: 'crosshair',
           touchAction: 'none',
         }}
-        title="Interactive ASCII Particle Matrix — move your mouse or touch to scatter particles"
+        title="Interactive ASCII Particle Matrix — Click or tap to trigger shockwave!"
       />
     </div>
   );
