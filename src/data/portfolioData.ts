@@ -117,7 +117,7 @@ export const PORTFOLIO_DATA = {
       status: 'LIVE',
       year: '2026',
       metrics: '250K messages/sec // < 3ms response',
-      description: 'A super fast data streaming system that lets apps talk to each other in milliseconds.',
+      description: 'A super fast data streaming system that lets apps talk to each other in milliseconds with zero dropped packets.',
       longDescription: 'Built with Go and WebSockets. Handles thousands of live updates simultaneously with zero drops, cutting server lag by over 60%.',
       tags: ['Go', 'WebSockets', 'Kafka', 'Redis', 'Docker'],
       github: 'https://github.com/pr4xh4r/aethermesh',
@@ -135,7 +135,7 @@ export const PORTFOLIO_DATA = {
       status: 'SHIPPED',
       year: '2026',
       metrics: '4x faster coding // Automated PR checks',
-      description: 'An AI assistant that reads through your codebase, answers questions, and writes clean code fixes.',
+      description: 'An AI assistant that reads through your codebase, answers questions, and writes clean code fixes directly.',
       longDescription: 'Built with TypeScript and modern LLM APIs. Can read entire repositories, spot security vulnerabilities, and propose GitHub pull requests automatically.',
       tags: ['TypeScript', 'Python', 'Gemini API', 'Vector Search', 'FastAPI'],
       github: 'https://github.com/pr4xh4r/novamind',
@@ -189,7 +189,7 @@ export const PORTFOLIO_DATA = {
       status: 'ACTIVE',
       year: '2025',
       metrics: 'Under 1ms overhead // Blocks spam & bots',
-      description: 'A fast security layer that guards web apps from spam, bad bots, and DDoS overload.',
+      description: 'A fast security layer that guards web apps from spam, bad bots, and DDoS overload before reaching servers.',
       longDescription: 'Placed in front of backend servers to check authentication tokens and block suspicious traffic before it can slow down your app.',
       tags: ['Go', 'Redis', 'Security', 'Reverse Proxy', 'Docker'],
       github: 'https://github.com/pr4xh4r/quantumshield',
@@ -219,6 +219,36 @@ export const PORTFOLIO_DATA = {
       ],
     },
   ] as Project[],
+
+  hardware: [
+    {
+      id: 'hw-01',
+      title: 'Physical AI Cyberdeck',
+      category: 'Hardware & Edge AI',
+      description: 'A custom portable terminal terminal built with mechanical keyboard, ultra-wide display, and edge AI coprocessor for local inference.',
+      tags: ['Raspberry Pi 5', 'Mechanical Keypad', 'OLED', 'Python', 'Local LLM'],
+      image: '/photos/a.jpg',
+      logUrl: 'https://github.com/pr4xh4r',
+    },
+    {
+      id: 'hw-02',
+      title: 'Sound-Reactive LED Controller',
+      category: 'Wearables & Microcontrollers',
+      description: 'A wearable real-time audio FFT analyzer and WS2812B addressable LED driver pulsing to live music frequencies.',
+      tags: ['ESP32', 'WS2812B', 'C++', 'FFT Audio', 'I2S Mic'],
+      image: '/photos/b.jpg',
+      logUrl: 'https://github.com/pr4xh4r',
+    },
+    {
+      id: 'hw-03',
+      title: 'Autonomous Rover Node',
+      category: 'Robotics & Embedded',
+      description: 'A differential drive mobile platform with ultrasonic navigation and camera stream for environmental mapping.',
+      tags: ['Arduino', 'Motor Drivers', 'OpenCV', 'Sensors'],
+      image: '/photos/c.jpg',
+      logUrl: 'https://github.com/pr4xh4r',
+    },
+  ],
 
   experience: [
     {

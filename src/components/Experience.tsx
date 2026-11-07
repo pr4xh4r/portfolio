@@ -1,94 +1,87 @@
-import React from 'react';
-import { Terminal, Calendar, MapPin, ChevronRight } from 'lucide-react';
+import React, { useState } from 'react';
+import { MapPin } from 'lucide-react';
 import { PORTFOLIO_DATA } from '../data/portfolioData';
 import { sound } from '../utils/audio';
 
 export const Experience: React.FC = () => {
   const { experience } = PORTFOLIO_DATA;
+  const [activeTab, setActiveTab] = useState(0);
+
+  const activeExp = experience[activeTab] || experience[0];
 
   return (
-    <section id="experience" className="relative py-20 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto">
-      
-      {/* Section Header */}
-      <div className="text-left space-y-3 mb-16">
-        <div className="inline-flex items-center gap-2 text-xs font-mono text-[#B4D9FD] bg-[#171715] px-3 py-1 border border-[#2a2a26] rounded-md">
-          <Terminal className="w-3.5 h-3.5" />
-          <span>// 04. EXPERIENCE</span>
-        </div>
-        <h2 className="text-3xl sm:text-5xl font-extrabold text-[#FAF9F5] tracking-tight uppercase font-pixel-head">
-          WHERE I'VE WORKED
+    <section id="experience" className="relative py-16 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto text-left">
+      {/* Section Header with extending horizontal line */}
+      <div className="flex items-center gap-4 mb-10">
+        <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#FAF9F5] flex items-center gap-2 whitespace-nowrap">
+          <span className="text-[#B4D9FD] font-mono">/</span>
+          <span>experience</span>
         </h2>
-        <p className="text-[#EDECE8]/70 max-w-2xl text-sm sm:text-base leading-relaxed font-sans">
-          A summary of my previous roles, engineering teams, and key accomplishments.
-        </p>
+        <div className="h-[1px] bg-[#2a2a26] flex-grow max-w-md"></div>
       </div>
 
-      {/* Timeline track */}
-      <div className="relative border-l border-[#2a2a26] ml-4 sm:ml-8 space-y-12">
-        {experience.map((exp) => (
-          <div
-            key={exp.id}
-            onMouseEnter={() => sound.playBlip(680, 0.02)}
-            className="relative pl-8 sm:pl-12 group text-left"
-          >
-            {/* Timeline Pixel Junction Node in pure Ice Blue */}
-            <div className="absolute -left-[7px] top-1.5 w-3.5 h-3.5 bg-[#121211] border-2 border-[#B4D9FD] flex items-center justify-center rounded-none group-hover:scale-125 transition-transform shadow-[0_0_10px_rgba(180,217,253,0.5)]">
-              <div className="w-1 h-1 bg-[#B4D9FD]"></div>
-            </div>
+      {/* Tabbed Experience Layout */}
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
+        {/* Left Column: Organization Tabs */}
+        <div className="md:col-span-4 flex md:flex-col overflow-x-auto border-b md:border-b-0 md:border-l border-[#2a2a26]">
+          {experience.map((exp, idx) => (
+            <button
+              key={exp.id}
+              onClick={() => {
+                sound.playBlip(680, 0.03);
+                setActiveTab(idx);
+              }}
+              className={`px-4 py-3 text-left font-mono text-xs sm:text-sm whitespace-nowrap transition-all border-b-2 md:border-b-0 md:-ml-[2px] md:border-l-2 ${
+                activeTab === idx
+                  ? 'border-[#B4D9FD] text-[#B4D9FD] bg-[#B4D9FD]/10 font-bold'
+                  : 'border-transparent text-[#EDECE8]/60 hover:text-[#EDECE8] hover:bg-[#1c1c1a]'
+              }`}
+            >
+              {exp.organization}
+            </button>
+          ))}
+        </div>
 
-            {/* Content Panel */}
-            <div className="dev-card p-6 rounded-lg transition-all">
-              
-              {/* Header row */}
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#222220] pb-4 mb-4">
-                <div>
-                  <div className="flex items-center gap-2 text-xs font-mono text-[#B4D9FD]">
-                    <Calendar className="w-3.5 h-3.5" />
-                    <span>{exp.period}</span>
-                  </div>
-                  <h3 className="text-lg sm:text-xl font-bold text-[#FAF9F5] group-hover:text-[#B4D9FD] font-mono mt-1 transition-colors">
-                    {exp.role}
-                  </h3>
-                </div>
-
-                <div className="text-left sm:text-right">
-                  <div className="font-mono text-xs text-[#B4D9FD] font-semibold">
-                    {exp.organization}
-                  </div>
-                  <div className="flex items-center sm:justify-end gap-1 text-[11px] text-[#EDECE8]/40 font-mono mt-0.5">
-                    <MapPin className="w-3 h-3 text-[#EDECE8]/30" />
-                    <span>{exp.location}</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Highlights in simple, clear English */}
-              <div className="space-y-2 mb-5">
-                {exp.highlights.map((highlight, idx) => (
-                  <div key={idx} className="flex items-start gap-2.5 text-xs sm:text-sm text-[#EDECE8]/80 font-sans">
-                    <ChevronRight className="w-4 h-4 text-[#B4D9FD] shrink-0 mt-0.5" />
-                    <span>{highlight}</span>
-                  </div>
-                ))}
-              </div>
-
-              {/* Technologies */}
-              <div className="flex flex-wrap gap-2 pt-3 border-t border-[#222220]">
-                {exp.technologies.map((tech) => (
-                  <span
-                    key={tech}
-                    className="text-[10px] font-mono px-2 py-0.5 bg-[#121211] text-[#EDECE8]/70 border border-[#2a2a26] rounded-sm"
-                  >
-                    {tech}
-                  </span>
-                ))}
-              </div>
-
+        {/* Right Column: Experience Details */}
+        <div className="md:col-span-8 space-y-4">
+          <div>
+            <h3 className="text-xl sm:text-2xl font-sans font-bold text-[#FAF9F5]">
+              {activeExp.role}{' '}
+              <span className="text-[#B4D9FD]">@ {activeExp.organization}</span>
+            </h3>
+            <div className="flex items-center gap-3 text-xs font-mono text-[#EDECE8]/60 mt-1">
+              <span>{activeExp.period}</span>
+              <span>•</span>
+              <span className="flex items-center gap-1">
+                <MapPin className="w-3 h-3 text-[#B4D9FD]" />
+                {activeExp.location}
+              </span>
             </div>
           </div>
-        ))}
-      </div>
 
+          {/* Bullet points with right arrow */}
+          <div className="space-y-3 pt-2">
+            {activeExp.highlights.map((highlight, idx) => (
+              <div key={idx} className="flex items-start gap-3 text-sm text-[#EDECE8]/80 font-sans leading-relaxed">
+                <span className="text-[#B4D9FD] text-xs mt-1 shrink-0">▷</span>
+                <span>{highlight}</span>
+              </div>
+            ))}
+          </div>
+
+          {/* Technologies */}
+          <div className="flex flex-wrap gap-2 pt-4 border-t border-[#222220]">
+            {activeExp.technologies.map((tech) => (
+              <span
+                key={tech}
+                className="text-xs font-mono px-2.5 py-1 bg-[#171715] text-[#EDECE8]/75 border border-[#2a2a26] rounded-md"
+              >
+                {tech}
+              </span>
+            ))}
+          </div>
+        </div>
+      </div>
     </section>
   );
 };

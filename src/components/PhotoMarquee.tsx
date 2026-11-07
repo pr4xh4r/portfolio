@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Camera, X, ChevronLeft, ChevronRight, Maximize2 } from 'lucide-react';
+import { X, ChevronLeft, ChevronRight, Maximize2 } from 'lucide-react';
 import { sound } from '../utils/audio';
 
 interface PhotoItem {
@@ -117,18 +117,14 @@ export const PhotoMarquee: React.FC<PhotoMarqueeProps> = ({ onModalOpenChange })
     <section id="photos" className="relative py-12 sm:py-16 w-full overflow-hidden">
       
       {/* Section Header */}
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mb-8">
-        <div className="text-left space-y-2">
-          <div className="inline-flex items-center gap-2 text-xs font-mono text-[#B4D9FD] bg-[#171715] px-3 py-1 border border-[#2a2a26] rounded-md">
-            <Camera className="w-3.5 h-3.5" />
-            <span>// SNAPSHOTS</span>
-          </div>
-          <h2 className="text-2xl sm:text-4xl font-extrabold text-[#FAF9F5] tracking-tight uppercase font-pixel-head">
-            MOMENTS & MEMORIES
+      {/* Header with extending horizontal line */}
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 mb-8 text-left">
+        <div className="flex items-center gap-4">
+          <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#FAF9F5] flex items-center gap-2 whitespace-nowrap">
+            <span className="text-[#B4D9FD] font-mono">/</span>
+            <span>art & snapshots</span>
           </h2>
-          <p className="text-[#EDECE8]/70 text-xs sm:text-sm font-sans max-w-xl">
-            A visual log of life outside the terminal — hackathons, building sprints, travels, and candid moments.
-          </p>
+          <div className="h-[1px] bg-[#2a2a26] flex-grow max-w-md"></div>
         </div>
       </div>
 

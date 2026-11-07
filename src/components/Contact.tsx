@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Terminal, Send, Copy, Check, ShieldCheck, Mail } from 'lucide-react';
+import { Send, Copy, Check, ShieldCheck, Mail } from 'lucide-react';
 import { PORTFOLIO_DATA } from '../data/portfolioData';
 import { sound } from '../utils/audio';
 import { GithubIcon, LinkedinIcon, TwitterIcon } from './Icons';
@@ -45,20 +45,14 @@ export const Contact: React.FC = () => {
   };
 
   return (
-    <section id="contact" className="relative py-20 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto">
-      
-      {/* Section Header */}
-      <div className="text-left space-y-3 mb-12">
-        <div className="inline-flex items-center gap-2 text-xs font-mono text-[#B4D9FD] bg-[#171715] px-3 py-1 border border-[#2a2a26] rounded-md">
-          <Terminal className="w-3.5 h-3.5" />
-          <span>// 05. CONTACT ME</span>
-        </div>
-        <h2 className="text-3xl sm:text-5xl font-extrabold text-[#FAF9F5] tracking-tight uppercase font-pixel-head">
-          LET'S TALK
+    <section id="contact" className="relative py-16 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto text-left">
+      {/* Section Header with extending horizontal line */}
+      <div className="flex items-center gap-4 mb-10">
+        <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#FAF9F5] flex items-center gap-2 whitespace-nowrap">
+          <span className="text-[#B4D9FD] font-mono">/</span>
+          <span>contact</span>
         </h2>
-        <p className="text-[#EDECE8]/70 max-w-2xl text-sm sm:text-base leading-relaxed font-sans">
-          Have an open role, a freelance project, or just want to say hi? Send me a message below and I'll get back to you within 24 hours.
-        </p>
+        <div className="h-[1px] bg-[#2a2a26] flex-grow max-w-md"></div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 text-left">

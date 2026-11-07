@@ -2,10 +2,12 @@ import { useState } from 'react';
 import { CosmicCanvas } from './components/CosmicCanvas';
 import { Navbar } from './components/Navbar';
 import { Hero } from './components/Hero';
-import { PhotoMarquee } from './components/PhotoMarquee';
-import { SkillsArsenal } from './components/SkillsArsenal';
-import { Projects } from './components/Projects';
+import { About } from './components/About';
 import { Experience } from './components/Experience';
+import { Projects } from './components/Projects';
+import { Hardware } from './components/Hardware';
+import { SkillsArsenal } from './components/SkillsArsenal';
+import { PhotoMarquee } from './components/PhotoMarquee';
 import { Contact } from './components/Contact';
 import { Footer } from './components/Footer';
 import { CosmicTerminal } from './components/CosmicTerminal';
@@ -30,8 +32,7 @@ export function App() {
 
   return (
     <div className="relative min-h-screen bg-[#121211] text-[#EDECE8] font-mono overflow-x-hidden selection:bg-[#388bfd]/30 selection:text-[#B4D9FD] checkered-bg">
-      
-      {/* Interactive Cellular Grid Canvas (Conway's Life & migrating square tiles) */}
+      {/* Interactive Cellular Grid Canvas */}
       <CosmicCanvas isWarping={isWarping} />
 
       {/* Top Navigation */}
@@ -42,17 +43,18 @@ export function App() {
         hidden={isPhotoOpen}
       />
 
-
       {/* Main Content Stream */}
       <main className="relative z-10 flex flex-col space-y-16 sm:space-y-24">
         <Hero
           onWarpTo={handleWarpTo}
           onOpenTerminal={() => setIsTerminalOpen(true)}
         />
-        <PhotoMarquee onModalOpenChange={setIsPhotoOpen} />
-        <SkillsArsenal />
-        <Projects />
+        <About />
         <Experience />
+        <Projects />
+        <Hardware />
+        <SkillsArsenal />
+        <PhotoMarquee onModalOpenChange={setIsPhotoOpen} />
         <Contact />
       </main>
 
@@ -65,7 +67,6 @@ export function App() {
         onClose={() => setIsTerminalOpen(false)}
         onWarpTo={handleWarpTo}
       />
-
     </div>
   );
 }

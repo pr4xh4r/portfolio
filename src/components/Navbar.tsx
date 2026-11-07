@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Terminal, Menu, X } from 'lucide-react';
+import { Mail, Terminal, Menu, X } from 'lucide-react';
+import { PORTFOLIO_DATA } from '../data/portfolioData';
+import { sound } from '../utils/audio';
+import { GithubIcon, LinkedinIcon } from './Icons';
 
 interface NavbarProps {
   onToggleTerminal: () => void;
@@ -10,11 +13,10 @@ interface NavbarProps {
 
 export const Navbar: React.FC<NavbarProps> = ({
   onToggleTerminal,
-  isTerminalOpen,
   onWarpTo,
   hidden = false,
 }) => {
-
+  const { profile } = PORTFOLIO_DATA;
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
@@ -26,17 +28,18 @@ export const Navbar: React.FC<NavbarProps> = ({
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-
   const navItems = [
-    { label: 'ABOUT', target: 'hero' },
-    { label: 'PHOTOS', target: 'photos' },
-    { label: 'SKILLS', target: 'skills' },
-    { label: 'PROJECTS', target: 'projects' },
-    { label: 'EXPERIENCE', target: 'experience' },
-    { label: 'CONTACT', target: 'contact' },
+    { label: 'Home', target: 'hero' },
+    { label: 'About', target: 'about' },
+    { label: 'Experience', target: 'experience' },
+    { label: 'Software', target: 'projects' },
+    { label: 'Hardware', target: 'hardware' },
+    { label: 'Skills', target: 'skills' },
+    { label: 'Art', target: 'photos' },
   ];
 
   const handleNavClick = (target: string) => {
+    sound.playBlip(720, 0.03);
     onWarpTo(target);
     setMobileMenuOpen(false);
   };
@@ -48,72 +51,87 @@ export const Navbar: React.FC<NavbarProps> = ({
       } ${
         scrolled
           ? 'bg-[#121211]/90 backdrop-blur-md border-[#2a2a26]'
-          : 'bg-[#121211]/80 backdrop-blur-sm border-[#222220]'
+          : 'bg-[#121211]/60 backdrop-blur-sm border-transparent'
       }`}
     >
-
-
-      {/* Main Bar */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-        
-        {/* Brand logo (Pixel mark) */}
-        <button
-          onClick={() => handleNavClick('hero')}
-          className="group flex items-center gap-3 text-left focus:outline-none"
-        >
-          {/* Circular Pixel Profile Logo */}
-          <div className="relative w-9 h-9 rounded-full overflow-hidden border border-[#2a2a26] group-hover:border-[#B4D9FD] group-hover:shadow-[0_0_12px_rgba(180,217,253,0.4)] transition-all shrink-0 bg-[#171715]">
-            <img
-              src="/avatar_pixel.png"
-              alt="pr4xh4r logo"
-              className="w-full h-full object-cover pixelated"
-            />
-          </div>
-
-          <div>
-            <div className="font-mono text-base font-bold tracking-tight text-[#FAF9F5] group-hover:text-[#B4D9FD] transition-colors">
-              pr4xh4r.dev
-            </div>
-          </div>
-        </button>
-
-        {/* Desktop Navigation Links */}
-        <nav className="hidden md:flex items-center gap-1 lg:gap-2">
-          {navItems.map((item) => (
-            <button
-              key={item.target}
-              onClick={() => handleNavClick(item.target)}
-              className="px-2.5 py-1 text-xs font-mono text-[#EDECE8]/80 hover:text-[#000000] hover:bg-[#B4D9FD] border border-transparent hover:border-[#B4D9FD] rounded-md transition-all uppercase tracking-wider"
-            >
-              {item.label}
-            </button>
-          ))}
-        </nav>
-
-        {/* Right Action Buttons */}
-        <div className="flex items-center gap-2">
-          
-
-
-
-          {/* Terminal / CLI Button */}
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+        {/* Left: Name / Brand */}
+        <div className="flex items-center gap-6 lg:gap-8">
           <button
-            onClick={() => onToggleTerminal()}
-            className={`px-3 py-1.5 text-xs font-mono font-medium rounded-md flex items-center gap-1.5 transition-all ${
-              isTerminalOpen
-                ? 'bg-[#B4D9FD] text-black shadow-[0_0_15px_rgba(180,217,253,0.4)]'
-                : 'bg-[#B4D9FD] text-black hover:bg-[#9ecbff]'
-            }`}
+            onClick={() => handleNavClick('hero')}
+            className="text-base font-bold font-sans tracking-tight text-[#FAF9F5] hover:text-[#B4D9FD] transition-colors focus:outline-none"
           >
-            <Terminal className="w-3 h-3" />
-            <span className="font-bold tracking-wide">&gt; CLI</span>
+            Prakhar Sharma
           </button>
 
+          {/* Desktop Nav Links */}
+          <nav className="hidden md:flex items-center gap-5 lg:gap-6 text-sm font-sans text-[#EDECE8]/80">
+            {navItems.map((item) => (
+              <button
+                key={item.target}
+                onClick={() => handleNavClick(item.target)}
+                className="hover:text-[#B4D9FD] transition-colors focus:outline-none"
+              >
+                {item.label}
+              </button>
+            ))}
+          </nav>
+        </div>
 
-          {/* Mobile hamburger menu */}
+        {/* Right: Social & Terminal Icons */}
+        <div className="hidden sm:flex items-center gap-4 text-[#EDECE8]/75">
+          <a
+            href={`mailto:${profile.email}`}
+            className="hover:text-[#B4D9FD] transition-colors p-1"
+            title="Email"
+          >
+            <Mail className="w-4 h-4" />
+          </a>
+
+          <a
+            href={profile.github}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-[#B4D9FD] transition-colors p-1"
+            title="GitHub"
+          >
+            <GithubIcon className="w-4 h-4" />
+          </a>
+
+          <a
+            href={profile.linkedin}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-[#B4D9FD] transition-colors p-1"
+            title="LinkedIn"
+          >
+            <LinkedinIcon className="w-4 h-4" />
+          </a>
+
+          <button
+            onClick={() => {
+              sound.playTerminalKey();
+              onToggleTerminal();
+            }}
+            className="hover:text-[#B4D9FD] transition-colors p-1 focus:outline-none"
+            title="Dev Terminal / Mode"
+          >
+            <Terminal className="w-4 h-4" />
+          </button>
+        </div>
+
+        {/* Mobile Menu Toggle */}
+        <div className="flex items-center gap-2 sm:hidden">
+          <button
+            onClick={() => onToggleTerminal()}
+            className="p-2 text-[#EDECE8]/75 hover:text-[#B4D9FD]"
+            title="Terminal"
+          >
+            <Terminal className="w-5 h-5" />
+          </button>
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden p-1.5 text-[#EDECE8] border border-[#2a2a26] rounded-md"
+            className="p-2 text-[#EDECE8]/75 hover:text-[#B4D9FD]"
           >
             {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
@@ -122,16 +140,30 @@ export const Navbar: React.FC<NavbarProps> = ({
 
       {/* Mobile Drawer */}
       {mobileMenuOpen && (
-        <div className="md:hidden bg-[#121211] border-b border-[#2a2a26] px-6 py-4 space-y-3">
-          {navItems.map((item) => (
-            <button
-              key={item.target}
-              onClick={() => handleNavClick(item.target)}
-              className="w-full text-left py-2 font-mono text-xs text-[#EDECE8] hover:text-[#B4D9FD] border-b border-[#1c1c1a] transition-colors"
-            >
-              &gt; {item.label}
-            </button>
-          ))}
+        <div className="sm:hidden bg-[#161614] border-b border-[#2a2a26] px-6 py-6 space-y-4">
+          <nav className="flex flex-col space-y-3 font-sans text-base">
+            {navItems.map((item) => (
+              <button
+                key={item.target}
+                onClick={() => handleNavClick(item.target)}
+                className="text-left text-[#EDECE8]/80 hover:text-[#B4D9FD] py-1 transition-colors"
+              >
+                {item.label}
+              </button>
+            ))}
+          </nav>
+
+          <div className="flex items-center gap-5 pt-4 border-t border-[#222220] text-[#EDECE8]/75">
+            <a href={`mailto:${profile.email}`} className="hover:text-[#B4D9FD]">
+              <Mail className="w-5 h-5" />
+            </a>
+            <a href={profile.github} target="_blank" rel="noopener noreferrer" className="hover:text-[#B4D9FD]">
+              <GithubIcon className="w-5 h-5" />
+            </a>
+            <a href={profile.linkedin} target="_blank" rel="noopener noreferrer" className="hover:text-[#B4D9FD]">
+              <LinkedinIcon className="w-5 h-5" />
+            </a>
+          </div>
         </div>
       )}
     </header>
