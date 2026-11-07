@@ -127,7 +127,7 @@ export const AsciiSilhouette: React.FC = () => {
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
 
-      // 1. Process active shockwaves
+      // 1. Process active shockwaves (invisible force wave)
       const activeShockwaves: Shockwave[] = [];
       shockwavesRef.current.forEach((sw) => {
         const age = (now - sw.startTime) / 1000;
@@ -135,17 +135,6 @@ export const AsciiSilhouette: React.FC = () => {
 
         if (radius < sw.maxRadius) {
           activeShockwaves.push(sw);
-          const progress = radius / sw.maxRadius;
-          const ringAlpha = (1 - progress) * 0.4;
-
-          // Draw faint glowing ring
-          ctx.save();
-          ctx.beginPath();
-          ctx.arc(sw.x, sw.y, radius, 0, Math.PI * 2);
-          ctx.strokeStyle = `rgba(180, 217, 253, ${ringAlpha})`;
-          ctx.lineWidth = 1.5;
-          ctx.stroke();
-          ctx.restore();
         }
       });
       shockwavesRef.current = activeShockwaves;

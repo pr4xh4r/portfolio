@@ -39,8 +39,6 @@ export const Hero: React.FC<HeroProps> = ({ onWarpTo, onOpenTerminal }) => {
         {/* Left Side: Interactive 3D ASCII Simulation Container */}
         <div className="lg:col-span-5 flex justify-center items-center order-1 lg:order-1">
           <div className="relative group">
-            {/* Subtle soft circular radial glow */}
-            <div className="absolute inset-0 bg-[#B4D9FD]/10 rounded-full blur-3xl pointer-events-none -z-10 transform scale-90"></div>
             <AsciiSilhouette />
           </div>
         </div>
