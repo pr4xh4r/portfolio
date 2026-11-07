@@ -1,5 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
-import asciiPointsData from '../data/asciiPoints.json';
+import hoodedPointsData from '../data/asciiPoints_hooded.json';
+import avatarPointsData from '../data/asciiPoints_avatar.json';
+import { sound } from '../utils/audio';
 
 interface Point {
   x: number;
@@ -36,6 +38,9 @@ export const AsciiSilhouette: React.FC = () => {
   const particlesRef = useRef<Particle[]>([]);
   const startTimeRef = useRef<number>(performance.now());
 
+  // Default to the new hooded silhouette model (matching the user's uploaded reference image)
+  const [modelVariant, setModelVariant] = useState<'hooded' | 'avatar'>('hooded');
+
   const [canvasSize, setCanvasSize] = useState<number>(() =>
     typeof window !== 'undefined' ? getCanvasSize(window.innerWidth) : 400
   );
@@ -50,7 +55,7 @@ export const AsciiSilhouette: React.FC = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Initialize particles from precomputed or sampled points
+  // Initialize particles from points
   const createParticles = (points: Point[], isSmall: boolean): Particle[] => {
     const fontSize = isSmall ? 5 : 7;
     return points.map((p) => ({
@@ -69,80 +74,19 @@ export const AsciiSilhouette: React.FC = () => {
     }));
   };
 
-  // Sample image dynamically if needed
-  const sampleFromImage = (img: HTMLImageElement, size: number): Point[] => {
-    const offCanvas = document.createElement('canvas');
-    const offCtx = offCanvas.getContext('2d');
-    if (!offCtx) return [];
-    offCanvas.width = size;
-    offCanvas.height = size;
-
-    const padding = 0.84;
-    const aspect = img.width / img.height;
-    let drawH = size * padding;
-    let drawW = drawH * aspect;
-    if (drawW > size * padding) {
-      drawW = size * padding;
-      drawH = drawW / aspect;
-    }
-    const offX = (size - drawW) / 2;
-    const offY = (size - drawH) / 2;
-
-    offCtx.drawImage(img, offX, offY, drawW, drawH);
-    const data = offCtx.getImageData(0, 0, size, size).data;
-    const chars = ' .:-=+*#%@'.split('');
-    const pts: Point[] = [];
-    const isSmall = size <= 280;
-    const h = isSmall ? 5 : 7;
-    const stepX = h * 0.7;
-    const stepY = h * 1.1;
-
-    for (let y = 0; y < size; y += stepY) {
-      for (let x = 0; x < size; x += stepX) {
-        const idx = (Math.floor(y) * size + Math.floor(x)) * 4;
-        if (data[idx + 3] > 120) {
-          const r = data[idx];
-          const g = data[idx + 1];
-          const b = data[idx + 2];
-          const brightness = (r + g + b) / 765;
-          const s = Math.floor(brightness * (chars.length - 1));
-          pts.push({
-            x: Number(x.toFixed(1)),
-            y: Number(y.toFixed(1)),
-            char: chars[s],
-            alpha: Number((0.4 + brightness * 0.6).toFixed(2)),
-          });
-        }
-      }
-    }
-    return pts;
-  };
-
-  // Load points: use precomputed data immediately, then sample image for high resolution
+  // Load points depending on the active model variant
   useEffect(() => {
     const isSmall = canvasSize <= 280;
     const key = canvasSize <= 240 ? '220' : canvasSize <= 300 ? '280' : '400';
-    const precomputed = (asciiPointsData as Record<string, Point[]>)[key];
+    const dataSource = modelVariant === 'hooded' ? hoodedPointsData : avatarPointsData;
+    const precomputed = (dataSource as Record<string, Point[]>)[key];
 
     if (precomputed && precomputed.length > 0) {
       particlesRef.current = createParticles(precomputed, isSmall);
       setIsReady(true);
       startTimeRef.current = performance.now();
     }
-
-    // Also attempt loading image for progressive enhancement
-    const img = new Image();
-    img.crossOrigin = 'Anonymous';
-    img.src = '/prakhar_ascii_silhouette.png';
-    img.onload = () => {
-      const sampled = sampleFromImage(img, canvasSize);
-      if (sampled.length > 0) {
-        particlesRef.current = createParticles(sampled, isSmall);
-        setIsReady(true);
-        startTimeRef.current = performance.now();
-      }
-    };
-  }, [canvasSize]);
+  }, [canvasSize, modelVariant]);
 
   // Main animation loop
   useEffect(() => {
@@ -240,8 +184,11 @@ export const AsciiSilhouette: React.FC = () => {
         p.x += p.vx;
         p.y += p.vy;
 
-        // Ice blue accent color from existing palette
-        ctx.fillStyle = `rgba(180, 217, 253, ${p.currentAlpha})`;
+        // Ice-blue palette styling matching user instruction
+        const isBrightChar = ['#', '%', '@', '+', '*'].includes(p.char);
+        const alpha = isBrightChar ? Math.min(1.0, p.currentAlpha * 1.15) : p.currentAlpha;
+
+        ctx.fillStyle = `rgba(180, 217, 253, ${alpha})`;
         ctx.fillText(p.char, p.x, p.y);
       });
     };
@@ -283,10 +230,16 @@ export const AsciiSilhouette: React.FC = () => {
       canvas.removeEventListener('touchmove', handleTouchMove);
       canvas.removeEventListener('touchend', handleMouseLeave);
     };
-  }, [canvasSize, isReady]);
+  }, [canvasSize, isReady, modelVariant]);
+
+  const handleToggleVariant = (variant: 'hooded' | 'avatar') => {
+    if (variant === modelVariant) return;
+    sound.playWarp();
+    setModelVariant(variant);
+  };
 
   return (
-    <div className="relative flex items-center justify-center">
+    <div className="relative flex flex-col items-center justify-center">
       <canvas
         ref={canvasRef}
         className="simulation-container select-none"
@@ -298,6 +251,32 @@ export const AsciiSilhouette: React.FC = () => {
         }}
         title="Interactive ASCII Particle Matrix — move your mouse or touch to scatter particles"
       />
+
+      {/* Silhouette Model Comparison Switcher */}
+      <div className="mt-2 inline-flex items-center gap-1.5 p-1 bg-[#161614] border border-[#2a2a26] rounded-full text-[10px] font-mono shadow-sm">
+        <button
+          onClick={() => handleToggleVariant('hooded')}
+          className={`px-2.5 py-0.5 rounded-full transition-all ${
+            modelVariant === 'hooded'
+              ? 'bg-[#B4D9FD] text-black font-bold'
+              : 'text-[#EDECE8]/60 hover:text-white'
+          }`}
+          title="New Hooded Hologram (designed from your uploaded reference)"
+        >
+          ● NEW HOODED
+        </button>
+        <button
+          onClick={() => handleToggleVariant('avatar')}
+          className={`px-2.5 py-0.5 rounded-full transition-all ${
+            modelVariant === 'avatar'
+              ? 'bg-[#B4D9FD] text-black font-bold'
+              : 'text-[#EDECE8]/60 hover:text-white'
+          }`}
+          title="Previous Cyber Avatar Model (saved and preserved)"
+        >
+          PREVIOUS MODEL
+        </button>
+      </div>
     </div>
   );
 };
