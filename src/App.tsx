@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { CosmicCanvas } from './components/CosmicCanvas';
 import { Navbar } from './components/Navbar';
 import { Hero } from './components/Hero';
 import { About } from './components/About';
@@ -14,27 +13,17 @@ import { CosmicTerminal } from './components/CosmicTerminal';
 
 export function App() {
   const [isTerminalOpen, setIsTerminalOpen] = useState(false);
-  const [isWarping, setIsWarping] = useState(false);
   const [isPhotoOpen, setIsPhotoOpen] = useState(false);
 
   const handleWarpTo = (sectionId: string) => {
-    setIsWarping(true);
-
     const targetEl = document.getElementById(sectionId);
     if (targetEl) {
       targetEl.scrollIntoView({ behavior: 'smooth' });
     }
-
-    setTimeout(() => {
-      setIsWarping(false);
-    }, 700);
   };
 
   return (
-    <div className="relative min-h-screen bg-[#121211] text-[#EDECE8] font-mono overflow-x-hidden selection:bg-[#388bfd]/30 selection:text-[#B4D9FD] checkered-bg">
-      {/* Interactive Cellular Grid Canvas */}
-      <CosmicCanvas isWarping={isWarping} />
-
+    <div className="relative min-h-screen bg-[#161616] text-[#EDECE8] font-mono overflow-x-hidden selection:bg-[#388bfd]/30 selection:text-[#B4D9FD]">
       {/* Top Navigation */}
       <Navbar
         onToggleTerminal={() => setIsTerminalOpen(!isTerminalOpen)}

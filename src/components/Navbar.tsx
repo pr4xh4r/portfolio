@@ -50,8 +50,8 @@ export const Navbar: React.FC<NavbarProps> = ({
         hidden ? '-translate-y-full opacity-0 pointer-events-none' : 'translate-y-0 opacity-100'
       } ${
         scrolled
-          ? 'bg-[#121211]/90 backdrop-blur-md border-[#2a2a26]'
-          : 'bg-[#121211]/60 backdrop-blur-sm border-transparent'
+          ? 'bg-[#161616]/90 backdrop-blur-md border-[#2a2a26]'
+          : 'bg-[#161616]/60 backdrop-blur-sm border-transparent'
       }`}
     >
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">

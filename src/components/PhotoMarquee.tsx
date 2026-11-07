@@ -132,8 +132,8 @@ export const PhotoMarquee: React.FC<PhotoMarqueeProps> = ({ onModalOpenChange })
       <div className="relative w-full overflow-hidden space-y-4">
         
         {/* Left & Right Smooth Edge Fade Masks */}
-        <div className="pointer-events-none absolute inset-y-0 left-0 w-16 sm:w-32 lg:w-48 bg-gradient-to-r from-[#121211] via-[#121211]/90 to-transparent z-20" />
-        <div className="pointer-events-none absolute inset-y-0 right-0 w-16 sm:w-32 lg:w-48 bg-gradient-to-l from-[#121211] via-[#121211]/90 to-transparent z-20" />
+        <div className="pointer-events-none absolute inset-y-0 left-0 w-16 sm:w-32 lg:w-48 bg-gradient-to-r from-[#161616] via-[#161616]/90 to-transparent z-20" />
+        <div className="pointer-events-none absolute inset-y-0 right-0 w-16 sm:w-32 lg:w-48 bg-gradient-to-l from-[#161616] via-[#161616]/90 to-transparent z-20" />
 
         {/* ROW 1: Scrolling Left */}
         <div className="flex overflow-hidden select-none marquee-row">

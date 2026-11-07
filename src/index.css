@@ -28,7 +28,7 @@
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #121211;
+  background: #161616;
 }
 ::-webkit-scrollbar-thumb {
   background: #2a2a26;
@@ -38,14 +38,9 @@
   background: #b4d9fd;
 }
 
-/* Checkered Background Grid */
-.checkered-bg {
-  background-color: #121211;
-  background-image: 
-    linear-gradient(#1e1e1c 1px, transparent 1px),
-    linear-gradient(to right, #1e1e1c 1px, transparent 1px);
-  background-size: 25px 25px;
-  background-attachment: fixed;
+/* Plain Dark Grey Background */
+.plain-dark-bg {
+  background-color: #161616;
 }
 
 /* Typography utilities */
