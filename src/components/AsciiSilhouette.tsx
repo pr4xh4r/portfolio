@@ -1,9 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import prakharPatternData from '../data/asciiPoints_prakhar_pattern.json';
-import realPhotoData from '../data/asciiPoints_real_photo.json';
-import previousAvatarData from '../data/asciiPoints_avatar.json';
-import uploadedTemplateData from '../data/asciiPoints_hooded.json';
-import { sound } from '../utils/audio';
+import solidAvatarData from '../data/asciiPoints.json';
 
 interface Point {
   x: number;
@@ -33,17 +29,12 @@ const getCanvasSize = (w: number) => {
   return 400;
 };
 
-type ModelType = 'prakhar_pattern' | 'real_photo' | 'previous_avatar' | 'uploaded_template';
-
 export const AsciiSilhouette: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const mouseRef = useRef({ x: -1000, y: -1000, active: false });
   const targetMouseRef = useRef({ x: -1000, y: -1000 });
   const particlesRef = useRef<Particle[]>([]);
   const startTimeRef = useRef<number>(performance.now());
-
-  // Default to Prakhar's photo with the reference pattern
-  const [modelType, setModelType] = useState<ModelType>('prakhar_pattern');
 
   const [canvasSize, setCanvasSize] = useState<number>(() =>
     typeof window !== 'undefined' ? getCanvasSize(window.innerWidth) : 400
@@ -78,37 +69,18 @@ export const AsciiSilhouette: React.FC = () => {
     }));
   };
 
-  // Load points depending on the active model
+  // Load solid avatar points
   useEffect(() => {
     const isSmall = canvasSize <= 280;
     const key = canvasSize <= 240 ? '220' : canvasSize <= 300 ? '280' : '400';
-
-    let dataSource: unknown;
-    switch (modelType) {
-      case 'prakhar_pattern':
-        dataSource = prakharPatternData;
-        break;
-      case 'real_photo':
-        dataSource = realPhotoData;
-        break;
-      case 'previous_avatar':
-        dataSource = previousAvatarData;
-        break;
-      case 'uploaded_template':
-        dataSource = uploadedTemplateData;
-        break;
-      default:
-        dataSource = prakharPatternData;
-    }
-
-    const precomputed = (dataSource as Record<string, Point[]>)[key];
+    const precomputed = (solidAvatarData as Record<string, Point[]>)[key];
 
     if (precomputed && precomputed.length > 0) {
       particlesRef.current = createParticles(precomputed, isSmall);
       setIsReady(true);
       startTimeRef.current = performance.now();
     }
-  }, [canvasSize, modelType]);
+  }, [canvasSize]);
 
   // Main animation loop
   useEffect(() => {
@@ -206,11 +178,8 @@ export const AsciiSilhouette: React.FC = () => {
         p.x += p.vx;
         p.y += p.vy;
 
-        // Ice-blue palette styling
-        const isFaceGlyph = ['#', '%', '@', '+', '*', '=', '-'].includes(p.char);
-        const alpha = isFaceGlyph ? Math.min(1.0, p.currentAlpha * 1.15) : p.currentAlpha * 0.85;
-
-        ctx.fillStyle = `rgba(180, 217, 253, ${alpha})`;
+        // Signature Ice-Blue palette styling
+        ctx.fillStyle = `rgba(180, 217, 253, ${p.currentAlpha})`;
         ctx.fillText(p.char, p.x, p.y);
       });
     };
@@ -252,16 +221,10 @@ export const AsciiSilhouette: React.FC = () => {
       canvas.removeEventListener('touchmove', handleTouchMove);
       canvas.removeEventListener('touchend', handleMouseLeave);
     };
-  }, [canvasSize, isReady, modelType]);
-
-  const handleToggle = (type: ModelType) => {
-    if (type === modelType) return;
-    sound.playWarp();
-    setModelType(type);
-  };
+  }, [canvasSize, isReady]);
 
   return (
-    <div className="relative flex flex-col items-center justify-center">
+    <div className="relative flex items-center justify-center">
       <canvas
         ref={canvasRef}
         className="simulation-container select-none"
@@ -273,57 +236,6 @@ export const AsciiSilhouette: React.FC = () => {
         }}
         title="Interactive ASCII Particle Matrix — move your mouse or touch to scatter particles"
       />
-
-      {/* Model Selector Bar so you can compare all variants */}
-      <div className="mt-3 flex flex-wrap items-center justify-center gap-1.5 p-1 bg-[#161614] border border-[#2a2a26] rounded-full text-[10px] font-mono shadow-sm">
-        <button
-          onClick={() => handleToggle('prakhar_pattern')}
-          className={`px-3 py-1 rounded-full transition-all ${
-            modelType === 'prakhar_pattern'
-              ? 'bg-[#B4D9FD] text-black font-bold shadow-xs'
-              : 'text-[#EDECE8]/60 hover:text-white'
-          }`}
-          title="Your Avatar styled with the reference pattern (dotted silhouette + glowing facial features)"
-        >
-          ● YOUR PHOTO (PATTERN)
-        </button>
-
-        <button
-          onClick={() => handleToggle('real_photo')}
-          className={`px-2.5 py-1 rounded-full transition-all ${
-            modelType === 'real_photo'
-              ? 'bg-[#B4D9FD] text-black font-bold shadow-xs'
-              : 'text-[#EDECE8]/60 hover:text-white'
-          }`}
-          title="Your Real Photo styled with the reference pattern"
-        >
-          REAL PHOTO (PATTERN)
-        </button>
-
-        <button
-          onClick={() => handleToggle('previous_avatar')}
-          className={`px-2.5 py-1 rounded-full transition-all ${
-            modelType === 'previous_avatar'
-              ? 'bg-[#B4D9FD] text-black font-bold shadow-xs'
-              : 'text-[#EDECE8]/60 hover:text-white'
-          }`}
-          title="Previous Blue Avatar Solid Model"
-        >
-          SOLID AVATAR
-        </button>
-
-        <button
-          onClick={() => handleToggle('uploaded_template')}
-          className={`px-2.5 py-1 rounded-full transition-all ${
-            modelType === 'uploaded_template'
-              ? 'bg-[#B4D9FD] text-black font-bold shadow-xs'
-              : 'text-[#EDECE8]/60 hover:text-white'
-          }`}
-          title="Uploaded Reference Image"
-        >
-          REF TEMPLATE
-        </button>
-      </div>
     </div>
   );
 };
