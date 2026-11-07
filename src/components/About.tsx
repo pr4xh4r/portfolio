@@ -66,11 +66,11 @@ export const About: React.FC = () => {
             {/* Main Photo container */}
             <div className="relative rounded-2xl overflow-hidden border border-[#2a2a26] group-hover:border-[#B4D9FD]/60 bg-[#171715] shadow-2xl transition-all duration-300 group-hover:-translate-y-2">
               <img
-                src="/profile_cropped.jpeg"
+                src="/avatar_blue.png"
                 alt={profile.name}
-                className="w-full h-auto object-cover aspect-square grayscale-[25%] contrast-105 group-hover:grayscale-0 group-hover:scale-105 transition-all duration-500"
+                className="w-full h-auto object-cover aspect-square contrast-105 group-hover:scale-105 transition-all duration-500"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#121211]/80 via-transparent to-transparent opacity-60 pointer-events-none"></div>
+              <div className="absolute inset-0 bg-gradient-to-t from-[#121211]/80 via-transparent to-transparent opacity-50 pointer-events-none"></div>
 
               <div className="absolute bottom-3 left-4 right-4 flex items-center justify-between text-[11px] font-mono text-[#EDECE8]/80 pointer-events-none">
                 <span className="text-[#B4D9FD]">@{profile.handle}</span>
