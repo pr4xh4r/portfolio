@@ -1,6 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
-import hoodedPointsData from '../data/asciiPoints_hooded.json';
-import avatarPointsData from '../data/asciiPoints_avatar.json';
+import prakharPatternData from '../data/asciiPoints_prakhar_pattern.json';
+import realPhotoData from '../data/asciiPoints_real_photo.json';
+import previousAvatarData from '../data/asciiPoints_avatar.json';
+import uploadedTemplateData from '../data/asciiPoints_hooded.json';
 import { sound } from '../utils/audio';
 
 interface Point {
@@ -31,6 +33,8 @@ const getCanvasSize = (w: number) => {
   return 400;
 };
 
+type ModelType = 'prakhar_pattern' | 'real_photo' | 'previous_avatar' | 'uploaded_template';
+
 export const AsciiSilhouette: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const mouseRef = useRef({ x: -1000, y: -1000, active: false });
@@ -38,8 +42,8 @@ export const AsciiSilhouette: React.FC = () => {
   const particlesRef = useRef<Particle[]>([]);
   const startTimeRef = useRef<number>(performance.now());
 
-  // Default to the new hooded silhouette model (matching the user's uploaded reference image)
-  const [modelVariant, setModelVariant] = useState<'hooded' | 'avatar'>('hooded');
+  // Default to Prakhar's photo with the reference pattern
+  const [modelType, setModelType] = useState<ModelType>('prakhar_pattern');
 
   const [canvasSize, setCanvasSize] = useState<number>(() =>
     typeof window !== 'undefined' ? getCanvasSize(window.innerWidth) : 400
@@ -74,11 +78,29 @@ export const AsciiSilhouette: React.FC = () => {
     }));
   };
 
-  // Load points depending on the active model variant
+  // Load points depending on the active model
   useEffect(() => {
     const isSmall = canvasSize <= 280;
     const key = canvasSize <= 240 ? '220' : canvasSize <= 300 ? '280' : '400';
-    const dataSource = modelVariant === 'hooded' ? hoodedPointsData : avatarPointsData;
+
+    let dataSource: unknown;
+    switch (modelType) {
+      case 'prakhar_pattern':
+        dataSource = prakharPatternData;
+        break;
+      case 'real_photo':
+        dataSource = realPhotoData;
+        break;
+      case 'previous_avatar':
+        dataSource = previousAvatarData;
+        break;
+      case 'uploaded_template':
+        dataSource = uploadedTemplateData;
+        break;
+      default:
+        dataSource = prakharPatternData;
+    }
+
     const precomputed = (dataSource as Record<string, Point[]>)[key];
 
     if (precomputed && precomputed.length > 0) {
@@ -86,7 +108,7 @@ export const AsciiSilhouette: React.FC = () => {
       setIsReady(true);
       startTimeRef.current = performance.now();
     }
-  }, [canvasSize, modelVariant]);
+  }, [canvasSize, modelType]);
 
   // Main animation loop
   useEffect(() => {
@@ -184,9 +206,9 @@ export const AsciiSilhouette: React.FC = () => {
         p.x += p.vx;
         p.y += p.vy;
 
-        // Ice-blue palette styling matching user instruction
-        const isBrightChar = ['#', '%', '@', '+', '*'].includes(p.char);
-        const alpha = isBrightChar ? Math.min(1.0, p.currentAlpha * 1.15) : p.currentAlpha;
+        // Ice-blue palette styling
+        const isFaceGlyph = ['#', '%', '@', '+', '*', '=', '-'].includes(p.char);
+        const alpha = isFaceGlyph ? Math.min(1.0, p.currentAlpha * 1.15) : p.currentAlpha * 0.85;
 
         ctx.fillStyle = `rgba(180, 217, 253, ${alpha})`;
         ctx.fillText(p.char, p.x, p.y);
@@ -230,12 +252,12 @@ export const AsciiSilhouette: React.FC = () => {
       canvas.removeEventListener('touchmove', handleTouchMove);
       canvas.removeEventListener('touchend', handleMouseLeave);
     };
-  }, [canvasSize, isReady, modelVariant]);
+  }, [canvasSize, isReady, modelType]);
 
-  const handleToggleVariant = (variant: 'hooded' | 'avatar') => {
-    if (variant === modelVariant) return;
+  const handleToggle = (type: ModelType) => {
+    if (type === modelType) return;
     sound.playWarp();
-    setModelVariant(variant);
+    setModelType(type);
   };
 
   return (
@@ -252,29 +274,54 @@ export const AsciiSilhouette: React.FC = () => {
         title="Interactive ASCII Particle Matrix — move your mouse or touch to scatter particles"
       />
 
-      {/* Silhouette Model Comparison Switcher */}
-      <div className="mt-2 inline-flex items-center gap-1.5 p-1 bg-[#161614] border border-[#2a2a26] rounded-full text-[10px] font-mono shadow-sm">
+      {/* Model Selector Bar so you can compare all variants */}
+      <div className="mt-3 flex flex-wrap items-center justify-center gap-1.5 p-1 bg-[#161614] border border-[#2a2a26] rounded-full text-[10px] font-mono shadow-sm">
         <button
-          onClick={() => handleToggleVariant('hooded')}
-          className={`px-2.5 py-0.5 rounded-full transition-all ${
-            modelVariant === 'hooded'
-              ? 'bg-[#B4D9FD] text-black font-bold'
+          onClick={() => handleToggle('prakhar_pattern')}
+          className={`px-3 py-1 rounded-full transition-all ${
+            modelType === 'prakhar_pattern'
+              ? 'bg-[#B4D9FD] text-black font-bold shadow-xs'
               : 'text-[#EDECE8]/60 hover:text-white'
           }`}
-          title="New Hooded Hologram (designed from your uploaded reference)"
+          title="Your Avatar styled with the reference pattern (dotted silhouette + glowing facial features)"
         >
-          ● NEW HOODED
+          ● YOUR PHOTO (PATTERN)
         </button>
+
         <button
-          onClick={() => handleToggleVariant('avatar')}
-          className={`px-2.5 py-0.5 rounded-full transition-all ${
-            modelVariant === 'avatar'
-              ? 'bg-[#B4D9FD] text-black font-bold'
+          onClick={() => handleToggle('real_photo')}
+          className={`px-2.5 py-1 rounded-full transition-all ${
+            modelType === 'real_photo'
+              ? 'bg-[#B4D9FD] text-black font-bold shadow-xs'
               : 'text-[#EDECE8]/60 hover:text-white'
           }`}
-          title="Previous Cyber Avatar Model (saved and preserved)"
+          title="Your Real Photo styled with the reference pattern"
         >
-          PREVIOUS MODEL
+          REAL PHOTO (PATTERN)
+        </button>
+
+        <button
+          onClick={() => handleToggle('previous_avatar')}
+          className={`px-2.5 py-1 rounded-full transition-all ${
+            modelType === 'previous_avatar'
+              ? 'bg-[#B4D9FD] text-black font-bold shadow-xs'
+              : 'text-[#EDECE8]/60 hover:text-white'
+          }`}
+          title="Previous Blue Avatar Solid Model"
+        >
+          SOLID AVATAR
+        </button>
+
+        <button
+          onClick={() => handleToggle('uploaded_template')}
+          className={`px-2.5 py-1 rounded-full transition-all ${
+            modelType === 'uploaded_template'
+              ? 'bg-[#B4D9FD] text-black font-bold shadow-xs'
+              : 'text-[#EDECE8]/60 hover:text-white'
+          }`}
+          title="Uploaded Reference Image"
+        >
+          REF TEMPLATE
         </button>
       </div>
     </div>
