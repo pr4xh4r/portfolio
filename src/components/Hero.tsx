@@ -45,9 +45,9 @@ export const Hero: React.FC<HeroProps> = ({ onWarpTo, onOpenTerminal }) => {
 
         {/* Right Side: Intro Block matching Gazi Jarin reference */}
         <div className="lg:col-span-7 flex flex-col items-center lg:items-start text-center lg:text-left space-y-6 order-2 lg:order-2">
-          {/* Title: "hi, prakhar here." with blinking cursor */}
+          {/* Title: "hi, pr4xh4r here." with blinking cursor */}
           <h1 className="text-4xl sm:text-6xl lg:text-7xl font-sans font-bold tracking-tight text-[#FAF9F5] leading-none">
-            hi, <span className="text-[#B4D9FD] inline-block hover:scale-105 transition-transform duration-200">prakhar</span> here.
+            hi, <span className="text-[#B4D9FD] inline-block hover:scale-105 transition-transform duration-200">pr4xh4r</span> here.
             <span className="text-[#B4D9FD] font-light ml-1 animate-terminal-blink">|</span>
           </h1>
 
