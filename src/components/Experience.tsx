@@ -31,31 +31,51 @@ export const Experience: React.FC = () => {
                 sound.playBlip(680, 0.03);
                 setActiveTab(idx);
               }}
-              className={`px-4 py-3 text-left font-mono text-xs sm:text-sm whitespace-nowrap transition-all border-b-2 md:border-b-0 md:-ml-[2px] md:border-l-2 ${
+              className={`px-4 py-3 text-left font-mono text-xs sm:text-sm whitespace-nowrap transition-all border-b-2 md:border-b-0 md:-ml-[2px] md:border-l-2 flex items-center gap-2 ${
                 activeTab === idx
                   ? 'border-[#B4D9FD] text-[#B4D9FD] bg-[#B4D9FD]/10 font-bold'
                   : 'border-transparent text-[#EDECE8]/60 hover:text-[#EDECE8] hover:bg-[#1c1c1a]'
               }`}
             >
-              {exp.organization}
+              {exp.logo && (
+                <img src={exp.logo} alt="" className="w-3.5 h-3.5 object-contain shrink-0" />
+              )}
+              <span>{exp.organization}</span>
+              {exp.isFounder && (
+                <span className="text-[9px] px-1.5 py-0.2 rounded bg-[#B4D9FD]/20 text-[#B4D9FD] font-mono uppercase tracking-wider font-semibold">
+                  Founder
+                </span>
+              )}
             </button>
           ))}
         </div>
 
         {/* Right Column: Experience Details */}
         <div className="md:col-span-8 space-y-4">
-          <div>
-            <h3 className="text-xl sm:text-2xl font-sans font-bold text-[#FAF9F5]">
-              {activeExp.role}{' '}
-              <span className="text-[#B4D9FD]">@ {activeExp.organization}</span>
-            </h3>
-            <div className="flex items-center gap-3 text-xs font-mono text-[#EDECE8]/60 mt-1">
-              <span>{activeExp.period}</span>
-              <span>•</span>
-              <span className="flex items-center gap-1">
-                <MapPin className="w-3 h-3 text-[#B4D9FD]" />
-                {activeExp.location}
-              </span>
+          <div className="flex items-start gap-4">
+            {activeExp.logo && (
+              <div className="w-11 h-11 rounded-lg bg-[#1f1f1d] border border-[#B4D9FD]/30 p-2 flex items-center justify-center shrink-0 shadow-[0_0_15px_rgba(180,217,253,0.15)] mt-0.5">
+                <img src={activeExp.logo} alt={activeExp.organization} className="w-full h-full object-contain" />
+              </div>
+            )}
+            <div>
+              <h3 className="text-xl sm:text-2xl font-sans font-bold text-[#FAF9F5] flex items-center gap-2 flex-wrap">
+                <span>{activeExp.role}</span>
+                <span className="text-[#B4D9FD]">@ {activeExp.organization}</span>
+                {activeExp.isFounder && (
+                  <span className="text-[10px] px-2 py-0.5 rounded-full border border-[#B4D9FD] text-[#B4D9FD] font-mono tracking-wider uppercase font-semibold">
+                    ● Flagship Venture
+                  </span>
+                )}
+              </h3>
+              <div className="flex items-center gap-3 text-xs font-mono text-[#EDECE8]/60 mt-1">
+                <span>{activeExp.period}</span>
+                <span>•</span>
+                <span className="flex items-center gap-1">
+                  <MapPin className="w-3 h-3 text-[#B4D9FD]" />
+                  {activeExp.location}
+                </span>
+              </div>
             </div>
           </div>
 

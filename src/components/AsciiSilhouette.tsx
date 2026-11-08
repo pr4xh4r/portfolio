@@ -1,5 +1,6 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import solidAvatarData from '../data/asciiPoints.json';
+import buildxData from '../data/buildxAsciiPoints.json';
 import { sound } from '../utils/audio';
 
 interface Point {
@@ -50,6 +51,51 @@ export const AsciiSilhouette: React.FC = () => {
     typeof window !== 'undefined' ? getCanvasSize(window.innerWidth) : 400
   );
   const [isReady, setIsReady] = useState(false);
+  const [activeModel, setActiveModel] = useState<'avatar' | 'buildx'>('avatar');
+  const activeModelRef = useRef<'avatar' | 'buildx'>('avatar');
+  activeModelRef.current = activeModel;
+
+  const toggleModel = useCallback(() => {
+    const nextModel = activeModelRef.current === 'avatar' ? 'buildx' : 'avatar';
+    setActiveModel(nextModel);
+    activeModelRef.current = nextModel;
+
+    sound.playWarp();
+    // Add radial shockwave at center of canvas
+    shockwavesRef.current.push({
+      x: canvasSize / 2,
+      y: canvasSize / 2,
+      startTime: performance.now(),
+      maxRadius: canvasSize * 0.9,
+      speed: 380,
+    });
+
+    const key = canvasSize <= 240 ? '220' : canvasSize <= 300 ? '280' : '400';
+    const targetSet = nextModel === 'buildx'
+      ? (buildxData as Record<string, Point[]>)[key]
+      : (solidAvatarData as Record<string, Point[]>)[key];
+
+    if (!targetSet || targetSet.length === 0) return;
+
+    particlesRef.current.forEach((p, idx) => {
+      const target = targetSet[idx % targetSet.length];
+      p.targetX = target.x;
+      p.targetY = target.y;
+      p.char = target.char;
+      p.baseAlpha = target.alpha;
+      // Dynamic outward dispersion kick so particles swarm into new form
+      const angle = Math.random() * Math.PI * 2;
+      const speed = 4 + Math.random() * 8;
+      p.vx += Math.cos(angle) * speed;
+      p.vy += Math.sin(angle) * speed;
+    });
+  }, [canvasSize]);
+
+  useEffect(() => {
+    const handleToggle = () => toggleModel();
+    window.addEventListener('toggle-avatar-morph', handleToggle);
+    return () => window.removeEventListener('toggle-avatar-morph', handleToggle);
+  }, [toggleModel]);
 
   // Resize handler
   useEffect(() => {
@@ -79,11 +125,12 @@ export const AsciiSilhouette: React.FC = () => {
     }));
   };
 
-  // Load solid avatar points
+  // Load avatar or buildx points
   useEffect(() => {
     const isSmall = canvasSize <= 280;
     const key = canvasSize <= 240 ? '220' : canvasSize <= 300 ? '280' : '400';
-    const precomputed = (solidAvatarData as Record<string, Point[]>)[key];
+    const targetData = activeModelRef.current === 'buildx' ? buildxData : solidAvatarData;
+    const precomputed = (targetData as Record<string, Point[]>)[key];
 
     if (precomputed && precomputed.length > 0) {
       particlesRef.current = createParticles(precomputed, isSmall);
@@ -314,6 +361,7 @@ export const AsciiSilhouette: React.FC = () => {
     <div className="relative flex flex-col items-center justify-center">
       <canvas
         ref={canvasRef}
+        onDoubleClick={toggleModel}
         className="simulation-container select-none active:scale-[0.99] transition-transform duration-100"
         style={{
           width: `${canvasSize}px`,
@@ -321,8 +369,21 @@ export const AsciiSilhouette: React.FC = () => {
           cursor: 'crosshair',
           touchAction: 'none',
         }}
-        title="Interactive ASCII Particle Matrix — Click or tap to trigger shockwave!"
+        title="Interactive ASCII Particle Matrix — Click to shockwave, double-click or use button below to morph!"
       />
+
+      {/* Sleek Minimal Morph Indicator */}
+      <div className="mt-2.5 flex items-center gap-2">
+        <button
+          onClick={toggleModel}
+          className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[#2a2a26] hover:border-[#B4D9FD]/40 bg-[#161616] hover:bg-[#1f1f1d] text-[#EDECE8]/60 hover:text-[#B4D9FD] text-[11px] font-mono transition-all group shadow-sm"
+          title="Morph particle simulation between portrait and Build X emblem (double-click canvas also works)"
+        >
+          <span className="text-[#B4D9FD] group-hover:rotate-180 transition-transform duration-500 text-xs">⟳</span>
+          <span>{activeModel === 'buildx' ? 'RESTORE PORTRAIT' : 'MORPH: BUILD X'}</span>
+          <span className={`w-1.5 h-1.5 rounded-full ${activeModel === 'buildx' ? 'bg-[#B4D9FD] animate-pulse' : 'bg-[#B4D9FD]/40'}`}></span>
+        </button>
+      </div>
     </div>
   );
 };

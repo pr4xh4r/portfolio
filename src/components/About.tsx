@@ -31,7 +31,12 @@ export const About: React.FC = () => {
         {/* Left Column: Text & Skills */}
         <div className="md:col-span-7 space-y-5 text-sm sm:text-base text-[#EDECE8]/85 font-sans leading-relaxed">
           <p>
-            I am the founder of <span className="text-[#B4D9FD] font-semibold">Build x</span>, where I architect intelligence by building AI-native software and autonomous systems that make hardware think. Previously, I've engineered high-throughput event streaming systems and production web platforms.
+            I am the founder of{' '}
+            <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-[#1f1f1d] border border-[#B4D9FD]/40 text-[#B4D9FD] font-mono text-xs sm:text-sm font-semibold align-baseline">
+              <img src="/buildx_logo_blue.png" alt="Build X" className="w-3.5 h-3.5 object-contain" />
+              <span>Build x</span>
+            </span>
+            , where I architect intelligence by building AI-native software and autonomous systems that make hardware think. Previously, I've engineered high-throughput event streaming systems and production web platforms.
           </p>
 
           <p>

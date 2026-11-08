@@ -66,6 +66,20 @@ export const CosmicTerminal: React.FC<CosmicTerminalProps> = ({
       case 'about':
         output = PORTFOLIO_DATA.terminalCommands.about;
         break;
+      case 'buildx':
+        sound.playSuccess();
+        output = `
+  :=====.          .=====:
+  -*****:          :*****-
+  -*+*+*.          .*+*+*-
+  -*****+==========+*****-   BUILD X // VENTURE LAB
+  -**********************-   Founder: pr4xh4r
+   .  =++++++++++++++=  .    Status: ACTIVE
+      -++++++++++++++-       Domain: AI-Native Systems & Hardware
+            =++=
+
+${PORTFOLIO_DATA.terminalCommands.buildx}`.trim();
+        break;
       case 'skills':
         output = PORTFOLIO_DATA.terminalCommands.skills;
         break;

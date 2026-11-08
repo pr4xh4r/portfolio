@@ -53,7 +53,20 @@ export const Hero: React.FC<HeroProps> = ({ onWarpTo, onOpenTerminal }) => {
 
           {/* Intro Description */}
           <p className="text-sm sm:text-lg text-[#EDECE8]/80 max-w-xl font-sans leading-relaxed">
-            Software engineer and founder of <span className="text-[#B4D9FD] font-medium">Build x</span>. I architect intelligence by building AI-native software and autonomous systems that make hardware think. Occasionally both happen at the same time.
+            Software engineer and founder of{' '}
+            <button
+              onClick={() => {
+                sound.playTerminalKey();
+                window.dispatchEvent(new CustomEvent('toggle-avatar-morph'));
+              }}
+              className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-[#1f1f1d] border border-[#B4D9FD]/40 text-[#B4D9FD] font-mono text-xs sm:text-sm font-semibold hover:border-[#B4D9FD] hover:bg-[#B4D9FD]/15 hover:shadow-[0_0_12px_rgba(180,217,253,0.25)] transition-all group align-baseline"
+              title="Click to toggle ASCII simulation morph to Build X!"
+            >
+              <img src="/buildx_logo_blue.png" alt="Build X" className="w-3.5 h-3.5 object-contain group-hover:scale-110 transition-transform" />
+              <span>Build x</span>
+              <span className="text-[10px] text-[#B4D9FD]/60 group-hover:text-[#B4D9FD]">⟳</span>
+            </button>
+            . I architect intelligence by building AI-native software and autonomous systems that make hardware think. Occasionally both happen at the same time.
           </p>
 
           {/* Action Buttons */}

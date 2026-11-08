@@ -59,9 +59,12 @@ export const Navbar: React.FC<NavbarProps> = ({
         <div className="flex items-center gap-6 lg:gap-8">
           <button
             onClick={() => handleNavClick('hero')}
-            className="text-base font-bold font-sans tracking-tight text-[#FAF9F5] hover:text-[#B4D9FD] transition-colors focus:outline-none"
+            className="text-base font-bold font-sans tracking-tight text-[#FAF9F5] hover:text-[#B4D9FD] transition-colors focus:outline-none flex items-center gap-2.5 group"
           >
-            Prakhar Sharma
+            <div className="w-6 h-6 rounded bg-[#1f1f1d] border border-[#B4D9FD]/30 p-1 flex items-center justify-center group-hover:border-[#B4D9FD] group-hover:shadow-[0_0_10px_rgba(180,217,253,0.3)] transition-all">
+              <img src="/buildx_logo_blue.png" alt="Build X" className="w-full h-full object-contain" />
+            </div>
+            <span>pr4xh4r</span>
           </button>
 
           {/* Desktop Nav Links */}

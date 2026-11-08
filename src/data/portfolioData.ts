@@ -34,6 +34,8 @@ export interface ExperienceItem {
   role: string;
   organization: string;
   location: string;
+  logo?: string;
+  isFounder?: boolean;
   highlights: string[];
   technologies: string[];
 }
@@ -252,6 +254,21 @@ export const PORTFOLIO_DATA = {
 
   experience: [
     {
+      id: 'exp-buildx',
+      period: '2024 - Present',
+      role: 'Founder & Systems Architect',
+      organization: 'Build X',
+      location: 'Remote / Global',
+      logo: '/buildx_logo_blue.png',
+      isFounder: true,
+      technologies: ['Autonomous AI', 'TypeScript', 'Go', 'Python', 'Edge Hardware', 'Distributed Systems'],
+      highlights: [
+        'Founded Build X to architect intelligence through AI-native software and autonomous embedded systems.',
+        'Engineered high-throughput real-time pipelines and agentic reasoning loops that bridge software with edge hardware.',
+        'Architected and shipped production-grade distributed architectures with low latency and high reliability.',
+      ],
+    },
+    {
       id: 'exp-01',
       period: '2024 - Present',
       role: 'Full-Stack & Systems Developer',
@@ -293,8 +310,9 @@ export const PORTFOLIO_DATA = {
   ] as ExperienceItem[],
 
   terminalCommands: {
-    help: 'Available commands:\n  • about        - Learn about me in plain English\n  • skills       - See the technologies I work with\n  • projects     - View my favorite projects\n  • experience   - Check out where I have worked\n  • contact      - Get my email and socials\n  • warp [sec]   - Jump to section (projects, skills, contact)\n  • clear        - Clear the screen',
+    help: 'Available commands:\n  • about        - Learn about me in plain English\n  • buildx       - Dossier on Build X venture lab\n  • skills       - See the technologies I work with\n  • projects     - View my favorite projects\n  • experience   - Check out where I have worked\n  • contact      - Get my email and socials\n  • warp [sec]   - Jump to section (projects, skills, contact)\n  • clear        - Clear the screen',
     about: "PR4XH4R // FULL-STACK DEVELOPER & BUILDER\nI build clean websites, smart AI tools, and fast backends.\nMy goal is simple: write reliable code that works well and makes users happy.",
+    buildx: 'BUILD X // AUTONOMOUS SYSTEMS & AI-NATIVE SOFTWARE\nFounder:     pr4xh4r\nStatus:      ACTIVE // IN OPERATION\nMission:     Architecting intelligence by building AI-native software\n             and autonomous systems that make hardware think.\nCore Stack:  Autonomous Agents, Edge Microcontrollers, Low-Latency Streaming',
     skills: 'TECH STACK:\n• Languages: TypeScript, JavaScript, Python, Go, SQL, Rust\n• Frontend:  React, Next.js, Tailwind CSS, Canvas\n• Backend:   Node.js, PostgreSQL, Redis, Docker\n• AI:        Gemini API, Vector Search, Smart Agents',
     contact: 'CONTACT INFO:\n• Email:    pr4xh4r@gmail.com\n• GitHub:   https://github.com/pr4xh4r\n• LinkedIn: https://linkedin.com/in/pr4xh4r\n• Status:   Open for internships, full-time roles & projects!',
     sudoHire: 'CLEARANCE GRANTED! 🎉\npr4xh4r is ready to build with you.\nDrop an email at: pr4xh4r@gmail.com',
